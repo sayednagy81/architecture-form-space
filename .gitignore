@@ -1,0 +1,13 @@
+# Large disk images not needed for GitHub Pages website
+*.iso
+Ar-form-space-order-2007.iso
+
+# Legacy Windows installers
+Software/
+Start.exe
+autorun.inf
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+*.log

@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="blueprint">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>العمارة: الشكل والفضاء والنظام | منصة دراسة العمارة التفاعلية</title>
+  <meta name="description" content="المنصة المعمارية التفاعلية لدراسة كتاب العمارة: الشكل والفضاء والنظام - فرانسيس شينغ. تشمل 25 عرضاً تفاعلياً أصلياً، مختبراً ثلاثي الأبعاد، معجماً للمصطلحات، واختبارات لطلاب العمارة.">
+  
+  <!-- Favicon / Vector Icon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d2ff' stroke-width='2'><rect x='3' y='3' width='18' height='18' rx='2'/><path d='M3 9h18'/><path d='M9 21V9'/></svg>">
+
+  <!-- Architectural Stylesheet -->
+  <link rel="stylesheet" href="css/blueprint.css">
+
+  <!-- Three.js & OrbitControls for 3D Studio -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Official Ruffle WebAssembly Flash Player Core -->
+  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+</head>
+<body>
+
+  <!-- ==========================================
+       HEADER & NAVIGATION BAR
+       ========================================== -->
+  <header class="site-header">
+    <div class="header-inner">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="logo-section">
+        <div class="blueprint-badge">CH</div>
+        <div class="site-title">
+          <span class="title-ar">العمارة: الشكل والفضاء والنظام</span>
+          <span class="title-en">Architecture: Form, Space & Order — Ching Interactive</span>
+        </div>
+      </a>
+
+      <!-- Global Search -->
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="search-input" class="search-input" 
+               placeholder="ابحث في العروض، الفصول، والمصطلحات المعمارية...">
+      </div>
+
+      <!-- Controls: Theme, Language, Actions -->
+      <div class="header-actions">
+        <!-- Language Switcher -->
+        <div style="display:flex;gap:4px;">
+          <button class="btn-drafting lang-btn active" data-lang="ar">عربي</button>
+          <button class="btn-drafting lang-btn" data-lang="en">EN</button>
+        </div>
+
+        <!-- Theme Switcher -->
+        <div style="display:flex;gap:4px;">
+          <button class="btn-drafting theme-btn active" data-theme="blueprint" title="مخطط أزرق معمارى">Blueprint</button>
+          <button class="btn-drafting theme-btn" data-theme="vellum" title="ورق كريمى معمارى">Vellum</button>
+          <button class="btn-drafting theme-btn" data-theme="dark" title="استوديو ليلى">Dark</button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==========================================
+       MAIN APP WORKSPACE
+       ========================================== -->
+  <main class="app-container">
+
+    <!-- LEFT / SIDEBAR: MODULES ACCORDION -->
+    <aside class="sidebar-panel drafting-box">
+      <div class="sidebar-header">
+        <span class="sidebar-title" data-i18n-ar="فصول الدراسة المعمارية" data-i18n-en="Architectural Modules">
+          فصول الدراسة المعمارية
+        </span>
+        <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--accent-cyan);">25 Units</span>
+      </div>
+
+      <!-- Module cards populated dynamically by js/app.js -->
+      <div class="modules-list" id="modules-nav-list"></div>
+    </aside>
+
+    <!-- RIGHT / CONTENT VIEWPORT AREA -->
+    <section class="content-area">
+
+      <!-- View Navigation Tabs -->
+      <nav class="view-tabs">
+        <button class="view-tab active" data-tab="player">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+          <span data-i18n-ar="العرض التفاعلي الأصلي" data-i18n-en="Interactive Module">العرض التفاعلي الأصلي</span>
+        </button>
+
+        <button class="view-tab" data-tab="3d">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          <span data-i18n-ar="المختبر ثلاثي الأبعاد" data-i18n-en="3D WebGL Studio">المختبر ثلاثي الأبعاد</span>
+        </button>
+
+        <button class="view-tab" data-tab="glossary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          <span data-i18n-ar="معجم المصطلحات" data-i18n-en="Architectural Glossary">معجم المصطلحات</span>
+        </button>
+
+        <button class="view-tab" data-tab="quiz">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          <span data-i18n-ar="اختبر معلوماتك" data-i18n-en="Self-Assessment Quiz">اختبر معلوماتك</span>
+        </button>
+      </nav>
+
+      <!-- ==========================================
+           TAB 1: RUFFLE INTERACTIVE FLASH PLAYER
+           ========================================== -->
+      <div id="tab-view-player" class="tab-view-section">
+        <div class="player-wrapper drafting-box" id="player-viewport-container">
+          
+          <!-- Top Toolbar: Section title and player controls -->
+          <div class="player-toolbar">
+            <div class="current-info-title">
+              <span class="active-sec-title" id="active-section-title">01.S1 : النقطة وتأثير نقطتين</span>
+              <span class="active-sec-sub" id="active-section-subtitle">العناصر الأساسية | The Point & Two Points</span>
+            </div>
+
+            <div class="player-controls">
+              <button class="btn-drafting" id="btn-reload-player" title="إعادة تشغيل العرض">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <span data-i18n-ar="إعادة" data-i18n-en="Restart">إعادة</span>
+              </button>
+              
+              <button class="btn-drafting" id="btn-fullscreen" title="ملء الشاشة">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+                <span data-i18n-ar="ملء الشاشة" data-i18n-en="Fullscreen">ملء الشاشة</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Native 800x650 Aspect Ratio Viewport Container -->
+          <div class="aspect-container">
+            <div id="ruffle-player-slot"></div>
+          </div>
+
+          <!-- Pedagogical Brief for Students -->
+          <div class="concept-details-card">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <strong style="color:var(--accent-gold);font-family:var(--font-mono);font-size:0.9rem;" 
+                      data-i18n-ar="التحليل المعماري للمفهوم:" data-i18n-en="Architectural Concept Analysis:">
+                التحليل المعماري للمفهوم:
+              </strong>
+              <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-muted);">Francis D.K. Ching Monograph</span>
+            </div>
+            <p class="concept-desc" id="concept-description-text">
+              النقطة كعنصر أحادي يشير إلى موقع في الفراغ بدون طول أو عرض أو عمق. استقرار النقطة المركزية، وتوليد محور توجيهي غير مرئي عند وجود نقطتين.
+            </p>
+            <div class="concept-tags" id="concept-key-tags"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 2: 3D WEBGL STUDIO
+           ========================================== -->
+      <div id="tab-view-3d" class="tab-view-section" style="display:none;">
+        <div class="studio-3d-wrapper drafting-box">
+          <div class="studio-toolbar">
+            <div class="concept-selector">
+              <button class="btn-concept" data-concept="point" data-i18n-ar="النقطة" data-i18n-en="Point">النقطة</button>
+              <button class="btn-concept" data-concept="line" data-i18n-ar="الخط والأعمدة" data-i18n-en="Line & Columns">الخط والأعمدة</button>
+              <button class="btn-concept" data-concept="plane" data-i18n-ar="المستوى والسقف" data-i18n-en="Planes & Canopy">المستوى والسقف</button>
+              <button class="btn-concept active" data-concept="volume" data-i18n-ar="الحجم والكتلة" data-i18n-en="Volume & Void">الحجم والكتلة</button>
+              <button class="btn-concept" data-concept="interlocking" data-i18n-ar="فضاءات متداخلة" data-i18n-en="Interlocking">فضاءات متداخلة</button>
+              <button class="btn-concept" data-concept="centralized" data-i18n-ar="التنظيم المركزي" data-i18n-en="Centralized">التنظيم المركزي</button>
+              <button class="btn-concept" data-concept="datum" data-i18n-ar="المرجع الحاكم" data-i18n-en="Datum">المرجع الحاكم</button>
+            </div>
+
+            <div style="display:flex;gap:6px;">
+              <button class="btn-drafting btn-render-mode active" data-mode="blueprint">Blueprint</button>
+              <button class="btn-drafting btn-render-mode" data-mode="solid">Solid</button>
+              <button class="btn-drafting btn-render-mode" data-mode="xray">X-Ray</button>
+            </div>
+          </div>
+
+          <div id="canvas3d-container">
+            <div class="studio-hint">🖱️ اسحب للتدوير | عجلة الماوس للتقريب | كليك يمين للتحريك</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 3: ARCHITECTURAL GLOSSARY
+           ========================================== -->
+      <div id="tab-view-glossary" class="tab-view-section" style="display:none;">
+        <div class="glossary-wrapper drafting-box">
+          <div class="glossary-filters">
+            <button class="btn-drafting glossary-filter-btn active" data-filter="all" data-i18n-ar="جميع المصطلحات" data-i18n-en="All Terms">جميع المصطلحات</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m1">01. العناصر الأساسية</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m2">02. الشكل والتشكيل</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m3">03. الشكل والفضاء</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m4">04. التنظيم الفضائي</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m5">05. الحركة والمسارات</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m6">06. النسبة والمقياس</button>
+            <button class="btn-drafting glossary-filter-btn" data-filter="m7">07. مبادئ النظام</button>
+          </div>
+
+          <div class="glossary-grid" id="glossary-terms-grid"></div>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           TAB 4: ARCHITECTURAL QUIZ
+           ========================================== -->
+      <div id="tab-view-quiz" class="tab-view-section" style="display:none;">
+        <div class="quiz-wrapper drafting-box" id="quiz-content-container"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       ARCHITECTURAL FOOTER
+       ========================================== -->
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="scale-bar">
+        <span>مقياس الرسم | GRAPHIC SCALE:</span>
+        <div class="scale-graphic"></div>
+        <span>0 — 5m</span>
+      </div>
+
+      <div>
+        <span>نظام الإسقاط: الأيزومتري والمعماري | PROJECTION: AXONOMETRIC & PERSPECTIVE</span>
+      </div>
+
+      <div>
+        <span>المرجع العلمي: فرانسيس شينغ | Francis D.K. Ching (John Wiley & Sons)</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Logic Modules -->
+  <script src="js/modules-data.js"></script>
+  <script src="js/glossary-data.js"></script>
+  <script src="js/quiz-data.js"></script>
+  <script src="js/viewer3d.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -13,7 +13,13 @@ class ArchApp {
     this.activeSearch = '';
     this.activeGlossaryFilter = 'all';
 
+    // Default playback is the AV1 video (about half the size); the original Flash/Ruffle player stays as an option
+    // and as the automatic fallback when the browser cannot play AV1.
+    const probe = document.createElement('video');
+    this.supportsAV1 = !!(probe.canPlayType && probe.canPlayType('video/mp4; codecs="av01.0.05M.08"'));
+    this.playbackMode = (localStorage.getItem('arch_mode') === 'flash') ? 'flash' : 'video';
     this.rufflePlayer = null;
+    this.ruffleLoading = null;
     this.loadToken = 0;     // identifies the latest section load, so a quick switch cannot start a stale Ruffle player
     this.loadTimer = null;
     this.studio3D = null;
@@ -226,10 +232,42 @@ class ArchApp {
     }
   }
 
-  loadSection(secId) {
+  // Loads the Ruffle script only when the Flash view is actually used.
+  ensureRuffle() {
+    if (window.RufflePlayer) return Promise.resolve();
+    if (!this.ruffleLoading) {
+      this.ruffleLoading = new Promise((resolve, reject) => {
+        const el = document.createElement('script');
+        el.src = 'https://unpkg.com/@ruffle-rs/ruffle';
+        el.onload = resolve;
+        el.onerror = () => { this.ruffleLoading = null; reject(new Error('Ruffle failed to load')); };
+        document.head.appendChild(el);
+      });
+    }
+    return this.ruffleLoading;
+  }
+
+  updateModeButton() {
+    const btn = document.getElementById('btn-mode');
+    if (!btn) return;
+    btn.style.display = this.supportsAV1 ? '' : 'none';
+    const label = btn.querySelector('span');
+    const toFlash = this.playbackMode === 'video';
+    const ar = toFlash ? 'العرض الأصلي (Flash)' : 'فيديو (أخف)';
+    const en = toFlash ? 'Original (Flash)' : 'Video (lighter)';
+    label.setAttribute('data-i18n-ar', ar);
+    label.setAttribute('data-i18n-en', en);
+    label.textContent = this.currentLang === 'ar' ? ar : en;
+  }
+
+  loadSection(secId, forceFlash = false) {
     const { section } = this.getCurrentSectionData();
     const slot = document.getElementById('ruffle-player-slot');
     if (!slot) return;
+    const box = slot.closest('.aspect-container');
+    const useVideo = this.supportsAV1 && this.playbackMode === 'video' && !forceFlash;
+    if (box) box.classList.toggle('is-video', useVideo);
+    this.updateModeButton();
 
     // A newer load supersedes any pending one; the previous Ruffle player is removed (destroyed) before a new one starts
     const token = ++this.loadToken;
@@ -237,6 +275,26 @@ class ArchApp {
     if (this.rufflePlayer) {
       try { this.rufflePlayer.remove(); } catch (e) { /* already gone */ }
       this.rufflePlayer = null;
+    }
+
+    if (useVideo) {
+      const video = document.createElement('video');
+      video.controls = true;
+      video.autoplay = true;
+      video.muted = true;          // the lectures have no audio track; muted autoplay is always allowed
+      video.playsInline = true;
+      video.preload = 'auto';
+      video.setAttribute('aria-label', section.titleEn);
+      video.src = section.swf.replace('swfs/', 'av1/').replace(/\.swf$/, '.mp4');
+      video.addEventListener('error', () => {
+        if (token !== this.loadToken) return;
+        console.warn('AV1 video failed, falling back to the Flash version', video.src);
+        this.loadSection(secId, true);
+      });
+      slot.innerHTML = '';
+      slot.appendChild(video);
+      video.play().catch(() => { /* the user can press play */ });
+      return;
     }
 
     // Show loading state
@@ -295,7 +353,13 @@ class ArchApp {
       }
     };
 
-    this.loadTimer = setTimeout(initPlayer, 50);
+    this.ensureRuffle().then(() => {
+      if (token === this.loadToken) this.loadTimer = setTimeout(initPlayer, 50);
+    }).catch(err => {
+      if (token !== this.loadToken) return;
+      console.error(err);
+      slot.innerHTML = '<div style="padding:20px;text-align:center;color:#f87171;font-family:var(--font-mono);">Ruffle could not be loaded (network).</div>';
+    });
   }
 
   // ==========================================
@@ -472,6 +536,16 @@ class ArchApp {
     const reloadBtn = document.getElementById('btn-reload-player');
     if (reloadBtn) {
       reloadBtn.addEventListener('click', () => {
+        this.loadSection(this.currentSectionId);
+      });
+    }
+
+    // 6b. Switch between the AV1 video and the original Flash version
+    const modeBtn = document.getElementById('btn-mode');
+    if (modeBtn) {
+      modeBtn.addEventListener('click', () => {
+        this.playbackMode = this.playbackMode === 'video' ? 'flash' : 'video';
+        try { localStorage.setItem('arch_mode', this.playbackMode); } catch (e) { /* private mode */ }
         this.loadSection(this.currentSectionId);
       });
     }

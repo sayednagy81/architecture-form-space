@@ -16,8 +16,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
-  <!-- Official Ruffle WebAssembly Flash Player Core -->
-  <script src="https://unpkg.com/@ruffle-rs/ruffle"></script>
+  <!-- Ruffle (Flash emulator) is loaded on demand from js/app.js, only for the original Flash view -->
 </head>
 <body>
 
@@ -130,6 +129,11 @@
                 <span data-i18n-ar="إعادة" data-i18n-en="Restart">إعادة</span>
               </button>
               
+              <button class="btn-drafting" id="btn-mode" title="تبديل نوع العرض">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                <span data-i18n-ar="العرض الأصلي (Flash)" data-i18n-en="Original (Flash)">العرض الأصلي (Flash)</span>
+              </button>
+
               <button class="btn-drafting" id="btn-fullscreen" title="ملء الشاشة">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
                 <span data-i18n-ar="ملء الشاشة" data-i18n-en="Fullscreen">ملء الشاشة</span>

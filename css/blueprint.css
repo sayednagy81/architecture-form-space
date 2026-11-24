@@ -283,11 +283,26 @@ body[dir="rtl"] .search-icon { right: 12px; }
   align-items: start;
 }
 
+.chapters-fab {
+  display: none; position: fixed; inset-inline-end: 14px; bottom: 14px; z-index: 50;
+  align-items: center; gap: 6px; padding: 9px 14px; border-radius: 999px; text-decoration: none;
+  font-family: var(--font-mono); font-size: .85rem; color: #031018; background: #00d2ff;
+  box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
 @media (max-width: 1100px) {
   .app-container {
     grid-template-columns: 1fr;
   }
+  /* grid items may shrink below their content, so wide children cannot widen the page */
+  .app-container > * { min-width: 0; }
+  .view-tabs { overflow-x: auto; }
+  /* on small screens the presentation comes first and the chapter list follows; a floating button jumps to it */
+  .sidebar-panel { order: 2; }
+  .chapters-fab { display: inline-flex; }
 }
+html[lang="ar"] .fab-en, html[lang="en"] .fab-ar { display: none; }
+.personal-link { color: inherit; text-decoration: underline dotted; text-underline-offset: 3px; }
+.personal-link:hover { color: #00d2ff; }
 
 /* Sidebar Navigation (Modules Accordion) */
 .sidebar-panel {
@@ -872,6 +887,7 @@ body[dir="rtl"] .search-icon { right: 12px; }
   .app-container {
     padding: 12px;
   }
+  .header-actions { flex-wrap: wrap; }
   #canvas3d-container {
     height: 380px;
   }

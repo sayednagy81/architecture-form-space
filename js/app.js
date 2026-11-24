@@ -14,6 +14,8 @@ class ArchApp {
     this.activeGlossaryFilter = 'all';
 
     this.rufflePlayer = null;
+    this.loadToken = 0;     // identifies the latest section load, so a quick switch cannot start a stale Ruffle player
+    this.loadTimer = null;
     this.studio3D = null;
 
     this.init();
@@ -57,6 +59,9 @@ class ArchApp {
   setLanguage(lang) {
     this.currentLang = lang;
     localStorage.setItem('arch_lang', lang);
+    // direction and language on <html> as well, so screen readers and the layout follow the switch
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
     document.body.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
 
     // Update Lang Toggle Buttons
@@ -226,6 +231,14 @@ class ArchApp {
     const slot = document.getElementById('ruffle-player-slot');
     if (!slot) return;
 
+    // A newer load supersedes any pending one; the previous Ruffle player is removed (destroyed) before a new one starts
+    const token = ++this.loadToken;
+    clearTimeout(this.loadTimer);
+    if (this.rufflePlayer) {
+      try { this.rufflePlayer.remove(); } catch (e) { /* already gone */ }
+      this.rufflePlayer = null;
+    }
+
     // Show loading state
     slot.innerHTML = `
       <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#00d2ff;font-family:var(--font-mono);gap:12px;">
@@ -236,10 +249,11 @@ class ArchApp {
 
     // Ensure Ruffle Player is ready
     const initPlayer = () => {
+      if (token !== this.loadToken) return; // superseded by a newer section
       try {
         if (!window.RufflePlayer) {
           console.warn('RufflePlayer not found, retrying...');
-          setTimeout(initPlayer, 200);
+          this.loadTimer = setTimeout(initPlayer, 200);
           return;
         }
 
@@ -263,9 +277,11 @@ class ArchApp {
         };
 
         // Load target SWF
-        this.rufflePlayer.load(section.swf).then(() => {
+        const player = this.rufflePlayer;
+        player.load(section.swf).then(() => {
           console.log(`Successfully loaded ${section.swf}`);
         }).catch(err => {
+          if (token !== this.loadToken) return; // the user already moved to another section
           console.error('Error loading SWF:', err);
           slot.innerHTML = `
             <div style="padding:20px;text-align:center;color:#f87171;font-family:var(--font-mono);">
@@ -279,7 +295,7 @@ class ArchApp {
       }
     };
 
-    setTimeout(initPlayer, 50);
+    this.loadTimer = setTimeout(initPlayer, 50);
   }
 
   // ==========================================
